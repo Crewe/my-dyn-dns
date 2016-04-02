@@ -24,7 +24,7 @@ class IPAddress(Base):
     def serializable(self):
         return {
             'id': self.id,
-            'ipv4': self.name,
+            'ipv4': self.ipv4,
         }
 
 
