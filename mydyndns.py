@@ -2,15 +2,17 @@
 
 import json
 import cgi
+import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, IPAddress
 from flask import Flask, request, redirect
 from flask import jsonify, make_response
 
+
 app = Flask(__name__)
-app.secret_key = 'S\xbe\x83U\xd1p{r\xef\xeaT\x96L\xaa\xefb\xd0\x90\xc9\xd1%\xf3\x19\xb8\xe9'
-engine = create_engine('sqlite:///ipdb.db')
+app.secret_key = 'APP_SECRET_KEY'
+engine = create_engine(config.connectionString())
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
@@ -34,10 +36,10 @@ def setIpAddress():
     return response
 
 
-@app.route('/limebox')
+@app.route('/server')
 def server():
     ip = getIpAddress()
-    return redirect(ip)
+    return redirect('http://' + ip.ipv4)
 
 
 def addIpAddress(ip):
@@ -48,7 +50,7 @@ def addIpAddress(ip):
 
 
 def getIpAddress():
-    ip_addr = session.query(IPAddress).one()
+    ip_addr = session.query(IPAddress).order_by(IPAddress.id.desc()).first()
     return ip_addr
 
 
